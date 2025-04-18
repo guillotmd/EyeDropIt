@@ -81,7 +81,9 @@ export default function AddMedication() {
         data.totalDoses = Number(data.totalDoses);
       }
       
-      console.log('Submitting medication data:', data);
+      console.log('Adding medication with data:', data);
+
+
       
       const response = await apiRequest('POST', '/api/medications', data);
       
@@ -102,6 +104,7 @@ export default function AddMedication() {
       }
       
       const medication = await response.json();
+      console.log('Medication added successfully:', medication);
       
       toast({
         title: "Medication added",
@@ -110,7 +113,7 @@ export default function AddMedication() {
       
       await refetchAll();
       navigate('/medications'); // Navigate back to medications list after adding
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding medication:', error);
       toast({
         title: "Error",

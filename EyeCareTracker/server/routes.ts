@@ -65,13 +65,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let validatedData;
       try {
         validatedData = enhancedInsertMedicationSchema.parse(req.body);
-      } catch (validationError) {
-        if (validationError instanceof z.ZodError) {
-          return res.status(400).json({ message: "Invalid medication data", errors: validationError.errors });
-        }
-        throw validationError;
+      } catch (validationError: any) { // Catch all errors
+        console.error("Validation error:", validationError); // Log the error
+        return res.status(400).json({ message: "Invalid medication data", errors: validationError.errors || validationError.message }); // Return a 400 with the error message
       }
-      
+
+
+
+
       // Then use the validated data for database operations
       const medication = insertMedicationSchema.parse({
         ...validatedData,
@@ -80,12 +81,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const created = await storage.createMedication(medication);
       res.status(201).json(created);
-    } catch (error) {
+    } catch (error: any) { // Catch all errors
       console.error("Error creating medication:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid medication data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to create medication" });
+    return res.status(500).json({ message: "Failed to create medication", error: error.message }); // Return a 500 with the error message
     }
   });
   
@@ -107,10 +105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let validatedData;
       try {
         validatedData = enhancedInsertMedicationSchema.parse(req.body);
-      } catch (validationError) {
+      } catch (validationError :any) {
         if (validationError instanceof z.ZodError) {
           return res.status(400).json({ message: "Invalid medication data", errors: validationError.errors });
-        }
+        } 
         throw validationError;
       }
       
@@ -367,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Add the API router
   app.use("/api", apiRouter);
-
+  
   const httpServer = createServer(app);
   return httpServer;
 }
